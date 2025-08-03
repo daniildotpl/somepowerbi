@@ -34,37 +34,38 @@ LIST_OF_TAGS = [
 def get_payload(engine, reporting_year, reporting_region):
 
     query = f"""
-        WITH preset AS (
+        WITH 
+        preset AS (
             SELECT 
                 year,
                 region,
-                (SELECT COUNT(*) FROM test.statinfo 
-                    WHERE year={str(reporting_year)} AND region={reporting_region} AND tip_mo='kid polyclinic') kids, 
-                (SELECT COUNT(*) FROM test.statinfo 
-                    WHERE year={str(reporting_year)} AND region={reporting_region} AND tip_mo='polyclinic') adult,
-                COUNT(*) count_org,
-                DENSE_RANK() OVER (PARTITION BY year ORDER BY COUNT(*) DESC) count_org_rank,
-                SUM(doctors) doctors,   
-                DENSE_RANK() OVER (PARTITION BY year ORDER BY SUM(doctors) DESC) doctors_rank,
-                SUM(nurse) nurse,   
-                DENSE_RANK() OVER (PARTITION BY year ORDER BY SUM(nurse) DESC) nurse_rank
+                COUNT(CASE WHEN tip_mo='kid polyclinic' THEN 1 END) OVER(PARTITION BY region, year) kids,
+                COUNT(CASE WHEN tip_mo='polyclinic' THEN 1 END) OVER(PARTITION BY region, year) adult,
+                COUNT(*) OVER(PARTITION BY region, year) count_org,
+                SUM(doctors) OVER(PARTITION BY region, year) doctors,
+                SUM(nurse) OVER(PARTITION BY region, year) nurse
             FROM test.statinfo
-            GROUP BY year, region
+        ),
+        ranked AS (
+            SELECT 
+                year,
+                region,
+                kids,
+                adult,
+                count_org,
+                DENSE_RANK() OVER (ORDER BY count_org DESC) as count_org_rank,
+                doctors,
+                DENSE_RANK() OVER (ORDER BY doctors DESC) as doctors_rank,
+                nurse,
+                DENSE_RANK() OVER (ORDER BY nurse DESC) as nurse_rank
+            FROM preset
         )
-        SELECT 
-            year,
-            region,
-            kids,
-            adult,
-            count_org,
-            count_org_rank,
-            doctors,
-            doctors_rank,
-            nurse,
-            nurse_rank
-        FROM preset
+        SELECT
+            *
+        FROM ranked
         WHERE year IN ({str(reporting_year)}, {str(reporting_year-1)}) AND region={reporting_region}
-        GROUP BY year, region, doctors, nurse
+        GROUP BY year, region, kids, adult, count_org, count_org_rank, doctors, nurse
+    ;
     """
     payload = pd.read_sql(query, engine)
     print(payload)
