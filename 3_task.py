@@ -39,8 +39,10 @@ def get_payload(engine, reporting_year, reporting_region):
             SELECT 
                 year,
                 region,
-                SUM(kids) kids,
-                (COUNT(*) - SUM(kids)) adult,
+                (SELECT COUNT(*) FROM statinfo 
+                    WHERE year IN ({str(reporting_year)}, {str(reporting_year-1)}) AND region={reporting_region} AND tip_mo='kid polyclinic') kids, 
+                (SELECT COUNT(*) FROM statinfo 
+                    WHERE year IN ({str(reporting_year)}, {str(reporting_year-1)}) AND region={reporting_region} AND tip_mo='polyclinic') adult,
                 COUNT(*) count_org,
                 DENSE_RANK() OVER (PARTITION BY year ORDER BY COUNT(*) DESC) as count_org_rank,
                 SUM(doctors) doctors,   

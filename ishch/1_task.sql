@@ -1,3 +1,4 @@
+USE test;
 WITH ranked AS (
 SELECT 
     year,
@@ -5,8 +6,8 @@ SELECT
     tip_mo,
     visits,
     ROUND(COUNT(*) OVER (PARTITION BY region, tip_mo)*100/COUNT(*) OVER (PARTITION BY region), 1) peroftype,
-    ROUND(visits/(SELECT population.population FROM population WHERE population.region=statinfo.region AND population.year=statinfo.year)*100000, 1) visits_on_th
-FROM statinfo
+    ROUND(visits/(SELECT test.population.population FROM population WHERE population.region=statinfo.region AND population.year=statinfo.year)*100000, 1) visits_on_th
+FROM test.statinfo
 )
 SELECT 
     year AS " | YEAR",

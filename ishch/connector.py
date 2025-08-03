@@ -1,10 +1,7 @@
 import os
-import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from dotenv import load_dotenv
-from docx import Document
-from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 
 
@@ -15,7 +12,7 @@ dbport = os.getenv('dbport')
 dbname = os.getenv('dbname')
 dbuser = os.getenv('dbuser')
 dbpass = os.getenv('dbpass')
-# print(f'{dbhost}:{dbport}:{dbname}:{dbuser}:{dbpass}')
+print(f'{dbhost}:{dbport}:{dbname}:{dbuser}:{dbpass}')
 
 
 def my_connection():
