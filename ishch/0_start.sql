@@ -1,3 +1,9 @@
+CREATE DATABASE test CHARACTER SET utf8 COLLATE utf8_general_ci;
+###
+GRANT ALL PRIVILEGES ON test.* TO 'dg'@'%';
+###
+FLUSH PRIVILEGES;
+###
 DROP TABLE IF EXISTS statinfo CASCADE;
 ###
 DROP TABLE IF EXISTS population CASCADE;
