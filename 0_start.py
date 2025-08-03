@@ -10,6 +10,7 @@ with open("ishch/0_start.sql", "r") as f:
 
     for query in queries:
         query = text(query)
-        print(query)
+        # print(query)
         connection = engine.connect()
         connection.execute(query)
+        connection.commit()

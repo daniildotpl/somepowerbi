@@ -13,8 +13,9 @@ def get_payload(engine, reporting_year, reporting_region):
             SUM(doctors) doctors,
             SUM(nurse) nurse,
             COUNT(*) count_org,
-            SUM(visits) visits
-        FROM statinfo
+            SUM(visits) visits,
+            SUM(nursevisits) nursevisits
+        FROM test.statinfo
         WHERE year IN ({str(reporting_year)}, {str(reporting_year-1)}) AND region={reporting_region}
         GROUP BY year
         ORDER BY year
@@ -27,7 +28,8 @@ def get_payload(engine, reporting_year, reporting_region):
         round((payload.loc[1]['doctors'] - payload.loc[0]['doctors'])/payload.loc[1]['doctors'], 2), 
         round((payload.loc[1]['nurse'] - payload.loc[0]['doctors'])/payload.loc[1]['nurse'], 2), 
         round((payload.loc[1]['count_org'] - payload.loc[0]['count_org'])/payload.loc[1]['count_org'], 2), 
-        round((payload.loc[1]['visits'] - payload.loc[0]['visits'])/payload.loc[1]['visits'], 2)
+        round((payload.loc[1]['visits'] - payload.loc[0]['visits'])/payload.loc[1]['visits'], 2),
+        round((payload.loc[1]['nursevisits'] - payload.loc[0]['nursevisits'])/payload.loc[1]['nursevisits'], 2)
     ]
     print(payload)
     return payload
@@ -74,7 +76,7 @@ def make_word(context):
 
 
 if __name__ == "__main__":
-    payload = get_payload(my_connection(), 2025, 77)
+    payload = get_payload(my_connection(), 2025, 67)
     context = get_context(payload)
     make_word(context)
 

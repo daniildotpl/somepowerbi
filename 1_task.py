@@ -6,8 +6,7 @@ from sqlalchemy import text
 
 def get_payload(engine):
     with open("ishch/1_task.sql", "r") as f:
-        query = f.read()
-        query = text(query)
+        query = text(f.read())
     df = pd.read_sql(query, engine)
     return df
 

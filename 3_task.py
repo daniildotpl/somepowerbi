@@ -1,7 +1,6 @@
 import pandas as pd
 from ishch.connector import my_connection
 from pptx import Presentation
-from pptx.util import Inches, Pt
 
 
 
@@ -39,17 +38,17 @@ def get_payload(engine, reporting_year, reporting_region):
             SELECT 
                 year,
                 region,
-                (SELECT COUNT(*) FROM statinfo 
-                    WHERE year IN ({str(reporting_year)}, {str(reporting_year-1)}) AND region={reporting_region} AND tip_mo='kid polyclinic') kids, 
-                (SELECT COUNT(*) FROM statinfo 
-                    WHERE year IN ({str(reporting_year)}, {str(reporting_year-1)}) AND region={reporting_region} AND tip_mo='polyclinic') adult,
+                (SELECT COUNT(*) FROM test.statinfo 
+                    WHERE year={str(reporting_year)} AND region={reporting_region} AND tip_mo='kid polyclinic') kids, 
+                (SELECT COUNT(*) FROM test.statinfo 
+                    WHERE year={str(reporting_year)} AND region={reporting_region} AND tip_mo='polyclinic') adult,
                 COUNT(*) count_org,
-                DENSE_RANK() OVER (PARTITION BY year ORDER BY COUNT(*) DESC) as count_org_rank,
+                DENSE_RANK() OVER (PARTITION BY year ORDER BY COUNT(*) DESC) count_org_rank,
                 SUM(doctors) doctors,   
-                DENSE_RANK() OVER (PARTITION BY year ORDER BY SUM(doctors) DESC) as doctors_rank,
+                DENSE_RANK() OVER (PARTITION BY year ORDER BY SUM(doctors) DESC) doctors_rank,
                 SUM(nurse) nurse,   
-                DENSE_RANK() OVER (PARTITION BY year ORDER BY SUM(nurse) DESC) as nurse_rank
-            FROM statinfo
+                DENSE_RANK() OVER (PARTITION BY year ORDER BY SUM(nurse) DESC) nurse_rank
+            FROM test.statinfo
             GROUP BY year, region
         )
         SELECT 
@@ -66,7 +65,6 @@ def get_payload(engine, reporting_year, reporting_region):
         FROM preset
         WHERE year IN ({str(reporting_year)}, {str(reporting_year-1)}) AND region={reporting_region}
         GROUP BY year, region, doctors, nurse
-        ;
     """
     payload = pd.read_sql(query, engine)
     print(payload)
@@ -141,16 +139,3 @@ if __name__ == "__main__":
     payload = get_payload(my_connection(), 2025, 67)
     context = get_context(payload)
     make_powerp(context)
-
-
-
-
-
-
-
-
-
-
-
-
-

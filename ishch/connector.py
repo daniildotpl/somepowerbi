@@ -17,7 +17,7 @@ print(f'{dbhost}:{dbport}:{dbname}:{dbuser}:{dbpass}')
 
 def my_connection():
     try:
-        engine = create_engine(f"mysql+pymysql://{dbuser}:{dbpass}@{dbhost}:{dbport}/{dbname}")
+        engine = create_engine(f"mysql+pymysql://{dbuser}:{dbpass}@{dbhost}:{dbport}")
         with engine.connect() as test_conn:
             print("Successful connection")
         return engine
